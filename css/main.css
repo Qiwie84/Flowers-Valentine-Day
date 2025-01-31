@@ -1412,6 +1412,12 @@ body {
   align-items: center;
 }
 
+.music-image {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  object-fit: cover;
+}
 .title-1 {
   color: white;
   font-size: 18px;
@@ -1537,6 +1543,21 @@ body {
     transform: scaleY(0.1);
   }
 }
+
+.greenline {
+  width: 3px;
+  height: 10px;
+  background-color: #1db954;
+  animation: playing 0.8s infinite ease-in-out alternate;
+}
+
+/* Ajusta la velocidad de cada línea para que se vean más naturales */
+.line-1 { animation-delay: 0s; }
+.line-2 { animation-delay: 0.2s; }
+.line-3 { animation-delay: 0.4s; }
+.line-4 { animation-delay: 0.6s; }
+.line-5 { animation-delay: 0.8s; }
+
 
 
 
