@@ -158,10 +158,7 @@ nextButton.addEventListener('click', nextSong);
 prevButton.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgressBar);
 
-// Hacer que la barra de progreso sea interactiva
-progressBar.addEventListener('input', event => {
-  audio.currentTime = (event.target.value / 100) * audio.duration;
-});
+
 
 // Cargar la primera canción al inicio
 window.addEventListener('load', () => {
