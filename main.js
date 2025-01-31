@@ -11,7 +11,7 @@ const progressBar = document.getElementById('progress');
 const currentTimeText = document.getElementById('current_time');
 const totalTimeText = document.getElementById('total_time');
 
-// Rutas de las canciones directamente en el HTML
+// Lista de canciones
 const songs = [
   { title: 'Flores Amarillas', artist: 'Floricienta', src: 'img/Flores Amarillas.mp3' },
   { title: 'Enchanted', artist: 'Taylor Swift', src: 'img/Enchanted.mp3' },
@@ -24,7 +24,7 @@ const songs = [
 // Índice de la canción actual
 let currentSongIndex = 0;
 
-// Rutas de las imágenes para cada canción
+// Imágenes de cada canción
 const images = [
   'img/Flores Amarillas.png',
   'img/Enchanted.png',
@@ -34,102 +34,87 @@ const images = [
   'img/Time After Time.png',
 ];
 
-// Obtener el contenedor para la letra
+// Contenedor de letras
 const lyricsContainer = document.querySelector('.lyrics-container');
+let currentLyricIndex = 0; // Control de las letras sincronizadas
 
-// Limpiar la letra antes de cargar una nueva
+// Función para limpiar la letra antes de cargar una nueva canción
 function clearLyrics() {
-  lyricsContainer.textContent = ''; // Limpia el contenedor de la letra
+  lyricsContainer.textContent = ''; // Limpia el contenedor de letras
+  currentLyricIndex = 0; // Reinicia la sincronización
 }
 
-// Función para cargar la letra y sincronizarla
+// Función para cargar la letra de la canción
 function loadLyrics(songIndex) {
   const songTitle = songs[songIndex].title;
-  const lrcFile = `lrc/${songTitle}.lrc`; // Ruta del archivo .lrc
+  const lrcFile = `lrc/${songTitle}.lrc`;
 
   fetch(lrcFile)
     .then(response => {
-      if (!response.ok) {
-        throw new Error('No se pudo cargar el archivo de la letra');
-      }
+      if (!response.ok) throw new Error('No se pudo cargar el archivo de la letra');
       return response.text();
     })
     .then(lyrics => {
-      const lyricsArray = parseLyrics(lyrics); // Parsear las letras
+      const lyricsArray = parseLyrics(lyrics);
       displayLyrics(lyricsArray);
     })
     .catch(error => {
       console.error('Error al cargar la letra:', error);
+      lyricsContainer.textContent = 'Letra no disponible'; // Mensaje si no hay letra
     });
 }
 
 // Función para parsear el archivo LRC
 function parseLyrics(lyrics) {
-  const lines = lyrics.split('\n');
-  const parsedLyrics = [];
-
-  lines.forEach(line => {
-    const timeMatch = line.match(/\[(\d{2}):(\d{2}\.\d{2})\]/);
-    if (timeMatch) {
-      const minutes = parseInt(timeMatch[1]);
-      const seconds = parseFloat(timeMatch[2]);
+  return lyrics.split('\n').map(line => {
+    const match = line.match(/\[(\d{2}):(\d{2}\.\d{2})\]/);
+    if (match) {
+      const minutes = parseInt(match[1]);
+      const seconds = parseFloat(match[2]);
       const text = line.replace(/\[\d{2}:\d{2}\.\d{2}\]/, '').trim();
-      parsedLyrics.push({ time: minutes * 60 + seconds, text });
+      return { time: minutes * 60 + seconds, text };
     }
-  });
-
-  return parsedLyrics;
+  }).filter(Boolean);
 }
 
-// Función para mostrar la letra en el momento adecuado
+// Función para mostrar la letra en el momento correcto
 function displayLyrics(lyricsArray) {
-  let currentLyricIndex = 0;
-  lyricsContainer.textContent = ''; // Limpiar antes de comenzar
+  clearLyrics(); // Limpiar antes de mostrar la nueva letra
 
-  // Cada vez que el tiempo cambia en la canción
-  audio.addEventListener('timeupdate', () => {
-    const currentTime = audio.currentTime;
+  audio.removeEventListener('timeupdate', syncLyrics); // Eliminar el evento previo
+  audio.addEventListener('timeupdate', syncLyrics);
 
-    // Si el índice es menor que la longitud de la letra y el tiempo actual es mayor o igual que el tiempo de la letra, mostrar la letra
-    if (currentLyricIndex < lyricsArray.length && currentTime >= lyricsArray[currentLyricIndex].time) {
-      lyricsContainer.textContent = lyricsArray[currentLyricIndex].text; // Mostrar el verso
+  function syncLyrics() {
+    if (currentLyricIndex < lyricsArray.length && audio.currentTime >= lyricsArray[currentLyricIndex].time) {
+      lyricsContainer.textContent = lyricsArray[currentLyricIndex].text;
       currentLyricIndex++;
     }
-  });
+  }
 }
 
-// Función para cambiar la imagen
+// Función para cambiar la imagen de la canción
 function changeImage(songIndex) {
-  const musicImage = document.getElementById('musicImage');
-  musicImage.src = images[songIndex]; // Cambiar la imagen según el índice de la canción
+  document.getElementById('musicImage').src = images[songIndex];
 }
 
-// Cargar la canción y cambiar la imagen
+// Función para cargar una nueva canción
 function loadSong(songIndex) {
   const song = songs[songIndex];
   audio.src = song.src;
   document.querySelector('.title-1').textContent = song.title;
   document.querySelector('.title-2').textContent = song.artist;
 
-  // Cambiar la imagen cuando cargamos la canción
   changeImage(songIndex);
+  clearLyrics(); // Borrar letras anteriores
+  loadLyrics(songIndex); // Cargar la nueva letra
 
-  // Limpiar la letra anterior y cargar la nueva
-  clearLyrics(); // Limpiar cualquier letra de la canción anterior
-  loadLyrics(songIndex); // Cargar la letra de la canción actual
-
-  // Asegurarse de cargar el audio y reproducirlo directamente
   audio.load();
   audio.play();
 }
 
 // Reproducir o pausar la canción
 function togglePlayPause() {
-  if (audio.paused) {
-    audio.play();
-  } else {
-    audio.pause();
-  }
+  audio.paused ? audio.play() : audio.pause();
 }
 
 // Cambiar a la siguiente canción
@@ -144,12 +129,9 @@ function prevSong() {
   loadSong(currentSongIndex);
 }
 
-// Actualizar la barra de progreso
+// Actualizar la barra de progreso y el tiempo de la canción
 function updateProgressBar() {
-  const progress = (audio.currentTime / audio.duration) * 100;
-  progressBar.value = progress;
-
-  // Actualizar el tiempo
+  progressBar.value = (audio.currentTime / audio.duration) * 100;
   currentTimeText.textContent = formatTime(audio.currentTime);
   totalTimeText.textContent = formatTime(audio.duration);
 }
@@ -161,29 +143,27 @@ function formatTime(time) {
   return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
 }
 
-// Cuando la canción termine, cargar la siguiente
+// Cuando la canción termine, pasar a la siguiente
 audio.addEventListener('ended', nextSong);
 
-// Si la canción es retrocedida, reiniciar la letra
+// Reiniciar letra cuando se retrocede la canción
 audio.addEventListener('seeked', () => {
-  clearLyrics(); // Limpiar la letra antes de sincronizar nuevamente
-  loadLyrics(currentSongIndex); // Volver a cargar la letra desde el nuevo tiempo
+  clearLyrics();
+  loadLyrics(currentSongIndex);
 });
 
-// Eventos
+// Eventos de botones
 playPauseButton.addEventListener('click', togglePlayPause);
 nextButton.addEventListener('click', nextSong);
 prevButton.addEventListener('click', prevSong);
 audio.addEventListener('timeupdate', updateProgressBar);
 
 // Hacer que la barra de progreso sea interactiva
-progressBar.addEventListener('input', (event) => {
-  const value = event.target.value;
-  const duration = audio.duration;
-  audio.currentTime = (value / 100) * duration; // Cambiar el tiempo de la canción
+progressBar.addEventListener('input', event => {
+  audio.currentTime = (event.target.value / 100) * audio.duration;
 });
 
-// Cargar y reproducir la primera canción al inicio
+// Cargar la primera canción al inicio
 window.addEventListener('load', () => {
   loadSong(currentSongIndex);
 });
