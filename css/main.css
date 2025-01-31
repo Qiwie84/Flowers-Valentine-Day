@@ -1600,7 +1600,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); /* Sombra en el contenedor para mayor contraste */
   
   position: fixed; /* Fijo en la pantalla */
-  top: 75%; /* Centrado vertical */
+  top: 80%; /* Centrado vertical */
   left: 50%; /* Centrado horizontal */
   transform: translate(-50%, -50%); /* Ajustar para centrar exactamente */
   width: 80%; /* Ancho más grande */
