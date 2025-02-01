@@ -78,7 +78,7 @@ body{
     background-color: yellow; /* Fondo amarillo */
     border: none; /* Sin bordes */
     padding: 10px 20px; /* Ajusta el relleno según tu preferencia */
-    font-size: 24px; /* Tamaño de fuente */
+    font-size: 18px; /* Tamaño de fuente */
     cursor: pointer;
     position: relative; /* Necesario para el resplandor */
     border-radius: 20px; /* Esquinas redondeadas */
