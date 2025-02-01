@@ -73,23 +73,26 @@ body{
     color: #fbff00;
 }
 
-/* Estilo para el botón */
+  /* Estilo para el botón */
 .button button {
     background-color: yellow; /* Fondo amarillo */
     border: none; /* Sin bordes */
-    padding: 10px 20px; /* Ajusta el relleno según tu preferencia */
-    font-size: 18px; /* Tamaño de fuente */
+    padding: 12px 24px; /* Aumenta un poco el relleno para mayor comodidad */
+    font-size: 24px; /* Aumenta el tamaño de la fuente */
+    font-weight: bold; /* Hace el texto más destacado */
     cursor: pointer;
     position: relative; /* Necesario para el resplandor */
     border-radius: 20px; /* Esquinas redondeadas */
     transition: background-color 0.3s ease-in-out; /* Transición suave para el color de fondo */
-  }
-  
-  /* Estilo para el enlace dentro del botón */
-  .button button a {
+}
+
+/* Estilo para el enlace dentro del botón */
+.button button a {
     text-decoration: none; /* Elimina el subrayado del enlace */
     color: inherit; /* Hereda el color del texto del botón */
-  }
+    font-size: 24px; /* Aumenta también el tamaño de la fuente del enlace */
+    font-weight: bold; /* Refuerza la visibilidad del texto */
+}
   
   /* Efecto de resplandor al pasar el cursor sobre el botón */
   .button button:hover {
